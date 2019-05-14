@@ -1,0 +1,39 @@
+结构如下
+!function(e,t){
+    "use strict";
+    "object" == typeof module && "object" == typeof module.exports ? module.exports = e.document ? t(e, !0) : function (e) {
+        if (!e.document) throw new Error("jQuery requires a window with a document");
+        return t(e)
+    } : t(e)
+}("undefined" != typeof window ? window : this, function (C, e) {});
+
+A.立即执行函数
+通过操作符： 将函数申明转换为函数表达式, 后面添加(args...)即可立即执行
+
+将函数声明转换成函数表达式，消除了javascript引擎识别函数表达式和函数声明的歧义，告诉javascript引擎这是一个函数表达式，不是函数声明，可以在后面加括号，并立即执行函数的代码。
+加括号是最安全的做法，因为!、+、-等运算符还会和函数的返回值进行运算，有时造成不必要的麻烦。
+
+不过这样的写法有什么用呢？
+
+javascript中没用私有作用域的概念，如果在多人开发的项目上，你在全局或局部作用域中声明了一些变量，可能会被其他人不小心用同名的变量给覆盖掉，
+
+根据javascript函数作用域链的特性，可以使用这种技术可以模仿一个私有作用域，用匿名函数作为一个“容器”，“容器”内部可以访问外部的变量，
+
+而外部环境不能访问“容器”内部的变量，所以( function(){…} )()内部定义的变量不会和外部的变量发生冲突，俗称“匿名包裹器”或“命名空间”。
+
+B."use strict";
+严格模式
+
+ ECMAScript 5 引入严格模式('strict mode')概念。通过严格模式，在函数内部选择进行较为严格的全局或局部的错误条件检测，使用严格模式的好处是可以提早知道代码中的存在的错误，
+
+及时捕获一些可能导致编程错误的ECMAScript行为。在开发中使用严格模式能帮助我们早发现错误。
+
+设立"严格模式"的目的，主要有以下几个：错误检测、规范、效率、安全、面向未来
+
+　　- 消除Javascript语法的一些不合理、不严谨之处，减少一些怪异行为;
+
+　　- 消除代码运行的一些不安全之处，保证代码运行的安全；
+
+　　- 提高编译器效率，增加运行速度；
+
+　　- 为未来新版本的Javascript做好铺垫。
