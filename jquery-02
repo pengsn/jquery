@@ -1,0 +1,71 @@
+  A. 源码中定义了很多初始化变量 , 方便压缩？
+  
+  B. isFunction 
+  函数判断 typeof obj.nodeType !== "number" 
+  为了区分某些浏览器中的object标签会当成一个function，所以过滤DOM Element对象
+  
+    节点类型	nodeName 返回	nodeValue 返回
+    1	Element	元素名	null
+    2	Attr	属性名称	属性值
+    3	Text	#text	节点的内容
+    4	CDATASection	#cdata-section	节点的内容
+    5	EntityReference	实体引用名称	null
+    6	Entity	实体名称	null
+    7	ProcessingInstruction	target	节点的内容
+    8	Comment	#comment	注释文本
+    9	Document	#document	null
+    10	DocumentType	文档类型名称	null
+    11	DocumentFragment	#document 片段	null
+    12	Notation	符号名称	null
+    
+var arr = [];
+
+var document = window.document;
+
+var getProto = Object.getPrototypeOf;
+
+var slice = arr.slice;
+
+var concat = arr.concat;
+
+var push = arr.push;
+
+var indexOf = arr.indexOf;
+
+var class2type = {};
+
+var toString = class2type.toString;
+
+var hasOwn = class2type.hasOwnProperty;
+
+var fnToString = hasOwn.toString;
+
+var ObjectFunctionString = fnToString.call( Object );
+
+var support = {};
+
+var isFunction = function isFunction( obj ) {
+
+      // Support: Chrome <=57, Firefox <=52
+      // In some browsers, typeof returns "function" for HTML <object> elements
+      // (i.e., `typeof document.createElement( "object" ) === "function"`).
+      // We don't want to classify *any* DOM node as a function.
+      return typeof obj === "function" && typeof obj.nodeType !== "number";
+  };
+
+
+var isWindow = function isWindow( obj ) {
+		return obj != null && obj === obj.window;
+	};
+
+
+
+
+	var preservedScriptAttributes = {
+		type: true,
+		src: true,
+		nonce: true,
+		noModule: true
+	};
+  
+  
