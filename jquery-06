@@ -1,0 +1,11 @@
+jQuery.prototype = {
+  constructor: jQuery
+  ...
+}
+
+为什么jQuery.prototype需要添加constructor属性指向jQuery?
+
+分析：
+jQuery.fn = jQuery.prototype = {}
+由于prototype是个对象字面量{}, 
+而对象字面量的constructor不存在了，所以需要重新指明。
