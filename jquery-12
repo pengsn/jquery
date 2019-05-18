@@ -1,0 +1,15 @@
+返回一个cache函数
+
+function createCache() {
+	var keys = [];
+
+	function cache( key, value ) {
+		//避免原型属性冲突
+		if ( keys.push( key + " " ) > Expr.cacheLength ) {
+			// Only keep the most recent entries
+			delete cache[ keys.shift() ];
+		}
+		return (cache[ key + " " ] = value);
+	}
+	return cache;
+}
