@@ -1,0 +1,9 @@
+Sizzle CSS Selector Engine v2.3.4
+
+css选择器引擎 Sizzle
+
+代码： 351~2603 
+var Sizzle = (function(window){ .... })(window);
+
+知识点
+时间戳 1*new Date()
