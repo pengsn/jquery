@@ -1,0 +1,13 @@
+// Populate the class2type map
+jQuery.each( "Boolean Number String Function Array Date RegExp Object Error Symbol".split( " " ),
+  function( i, name ) {
+	  class2type[ "[object " + name + "]" ] = name.toLowerCase();
+  } 
+);
+
+//  jQuery each 迭代数组， 回调函数填充class2type
+
+class2type 填充
+var class2type = {};
+toString = class2type.toString;
+toString.call({}) == [object object]
