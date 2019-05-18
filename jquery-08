@@ -1,0 +1,13 @@
+判断变量是否为空，undefined，null的处理方式
+
+通过!! 省去了多次判断null、undefined和空字符串的冗余代码
+
+如：
+if(a !=null && typeof(a) !='undefined' && a!='') {
+    //
+}
+
+修改为
+if(!!a) {
+
+}
