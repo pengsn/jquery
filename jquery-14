@@ -1,0 +1,45 @@
+The following table summarizes the Selector syntax:
+
+Pattern	Meaning	Described in section	First defined in CSS level
+*	    				所有元素
+E	    				元素E
+E[foo]					元素E属性foo
+E[foo="bar"]			元素E，属性foo=bar
+E[foo~="bar"]			元素E，属性foo包含一个bar单词
+E[foo^="bar"]			元素E, 以bar开头
+E[foo$="bar"]			元素E，以bar结尾
+E[foo*="bar"]			元素E，包含bar
+E[foo|="en"]			元素E，以en开头-连接符
+E:root					根元素
+E:nth-child(n)			元素E第n个子元素							3
+E:nth-last-child(n)		元素E第倒数n个子元素
+E:nth-of-type(n)		元素E父集元素的第n个子元素
+E:nth-last-of-type(n)	元素E父集元素的倒数第n个子元素
+E:first-child			元素E第一个子元素
+E:last-child			元素E倒数第一个子元素
+E:first-of-type			元素E父元素第一个字元素
+E:last-of-type			元素E父元素倒数第一个字元素
+E:only-child			元素E的父元素只有唯一一个子元素
+E:only-of-type			元素E的父元素的只有唯一一个E的元素
+E:empty					元素E的子元素为空
+E:link					元素E的未被访问
+E:visited				元素E被访问
+E:active				元素E选中
+E:hover					鼠标浮动在元素E放上去
+E:focus					元素E获取到焦点
+E:target				当前活动的锚点连接
+E:lang(fr)				已指定fr开头的的lang属性
+E:enabled				元素E enabled
+E:disabled				元素E disabled	
+E:checked				元素E被选中 checked
+E::first-line			首行
+E::first-letter			首字符
+E::before				元素E之前生成内容
+E::after				元素E之后生成内容
+E.warning	an E element whose class is "warning" (the document language specifies how class is determined).	Class selectors	1
+E#myid					元素下id为myid的元素
+E:not(s)				匹配非s的元素  可以提高优先级如： #foo:not(#ccc)
+E F						E的所有后代元素F
+E > F					E的所有子元素F
+E + F					E后面的所有兄弟元素
+E ~ F					E后面的第一个兄弟元素
