@@ -1,3 +1,4 @@
+isWindow, globalEval,toString,trim
 1. 检测window对象的方式
   window有个window属性执行window对象
   var isWindow = function isWindow( obj ) {
