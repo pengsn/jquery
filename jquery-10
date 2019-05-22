@@ -1,3 +1,9 @@
+jQuery class2type的填充
+
+[object boolean]
+[object number]
+...
+
 // Populate the class2type map
 jQuery.each( "Boolean Number String Function Array Date RegExp Object Error Symbol".split( " " ),
   function( i, name ) {
