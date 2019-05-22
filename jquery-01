@@ -1,4 +1,4 @@
-结构如下
+jQuery插件的结构如下
 !function(e,t){
     "use strict";
     "object" == typeof module && "object" == typeof module.exports ? module.exports = e.document ? t(e, !0) : function (e) {
