@@ -1,4 +1,5 @@
 jquery构造工厂生成的对象
+ jQuery(), $('') 代码解析
 参考链接:
 https://www.cnblogs.com/elcarim5efil/p/4686286.html
 
