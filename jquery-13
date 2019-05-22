@@ -1,4 +1,5 @@
 jQuery:Sizzle下正则
+javascript正则表达式使用
 1. 正则的创建方式
 	构造函数创建 RegExp
 	var a = new RegExp("", "gi");
