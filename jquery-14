@@ -1,6 +1,7 @@
 The following table summarizes the Selector syntax:
 
 Pattern	Meaning	Described in section	First defined in CSS level
+
 *	    				所有元素
 E	    				元素E
 E[foo]					元素E属性foo
