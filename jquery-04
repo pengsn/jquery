@@ -1,3 +1,4 @@
+版本号定义以及jQuery工厂函数
 初始变量定义
 1. version号
 2. jQuery的一个工厂对象
