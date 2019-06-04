@@ -1,0 +1,138 @@
+Sizzle 构造函数
+
+/**
+	1. 选择器针对简单的ID，TAG，CLASS直接返回结果
+	2. 针对支持querySelectorAll方法的浏览器，直接通过querySelectorAll方法来获取结果
+	3. 除上述外则通过select方法来获取
+
+	selector 选择器字符串
+	context 上面文的dom
+	results 已经匹配的部分结果,若无则为[]
+	seed 初始集合
+**/
+function Sizzle( selector, context, results, seed ) {
+	var m, i, elem, nid, match, groups, newSelector,
+		//读取到器document环境
+		newContext = context && context.ownerDocument,
+
+		//由于上下文默认为document， 所以nodeType默认为9
+		nodeType = context ? context.nodeType : 9;
+
+	results = results || [];
+
+	//从带有无效选择器或上下文的调用中提前返回
+	if ( typeof selector !== "string" || !selector ||
+		nodeType !== 1 && nodeType !== 9 && nodeType !== 11 ) {
+
+		return results;
+	}
+
+	//尝试在HTML文档中快捷查找操作(与过滤器相反) seed : '', "", null, undefined, false, NaN, 0
+	if ( !seed ) {
+		
+		// 设置context上下文
+		if ( ( context ? context.ownerDocument || context : preferredDoc ) !== document ) {
+			setDocument( context );
+		}
+		context = context || document;
+		
+		//检查环境是否是html
+		if ( documentIsHTML ) {
+			
+			//如果选择器足够简单，尝试用Dom的get*By* 方法来处理 , 除非上下文环境不存在get*By*方法
+			if ( nodeType !== 11 && (match = rquickExpr.exec( selector )) ) {
+
+				// 知识点: Expr 正则表达式如果存在多个表达式，exec执行结果返回的数组大小即为表达式的个数
+				// 由正则：rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/ 可以看出
+				// 1. id选择器 2. Tag 选择器 3. 类选择器
+				if ( (m = match[1]) ) {
+
+					// 上下文环境document
+					if ( nodeType === 9 ) {
+						// 找到将结果添加到之前的result中，返回; 未找到则返回之前的results
+						if ( (elem = context.getElementById( m )) ) {
+							if ( elem.id === m ) {
+								results.push( elem );
+								return results;
+							}
+						} else {
+							return results;
+						}
+
+					// Element context
+					} else {
+						if ( newContext && (elem = newContext.getElementById( m )) &&
+							contains( context, elem ) &&
+							elem.id === m ) {
+
+							results.push( elem );
+							return results;
+						}
+					}
+
+				// Type selector
+				} else if ( match[2] ) {
+					push.apply( results, context.getElementsByTagName( selector ) );
+					return results;
+
+				// 检查是否支持get*By*
+				} else if ( (m = match[3]) && support.getElementsByClassName &&
+					context.getElementsByClassName ) {
+
+					push.apply( results, context.getElementsByClassName( m ) );
+					return results;
+				}
+			}
+
+			// 查询检查 是否支持 querySelectorAll 简单的css选择器 测试性能较 get*By* 差
+			if ( support.qsa &&
+				!nonnativeSelectorCache[ selector + " " ] &&
+				(!rbuggyQSA || !rbuggyQSA.test( selector )) &&
+
+				(nodeType !== 1 || context.nodeName.toLowerCase() !== "object") ) {
+
+				newSelector = selector;
+				newContext = context;
+				
+				// nodeType=1元素节点 往下查询的正则 |>
+				if ( nodeType === 1 && rdescend.test( selector ) ) {
+
+					// Capture the context ID, setting it first if necessary
+					if ( (nid = context.getAttribute( "id" )) ) {
+						nid = nid.replace( rcssescape, fcssescape );
+					} else {
+						context.setAttribute( "id", (nid = expando) );
+					}
+
+					// Prefix every selector in the list
+					groups = tokenize( selector );
+					i = groups.length;
+					while ( i-- ) {
+						groups[i] = "#" + nid + " " + toSelector( groups[i] );
+					}
+					newSelector = groups.join( "," );
+
+					// Expand context for sibling selectors
+					newContext = rsibling.test( selector ) && testContext( context.parentNode ) ||
+						context;
+				}
+
+				try {
+					push.apply( results,
+						newContext.querySelectorAll( newSelector )
+					);
+					return results;
+				} catch ( qsaError ) {
+					nonnativeSelectorCache( selector, true );
+				} finally {
+					if ( nid === expando ) {
+						context.removeAttribute( "id" );
+					}
+				}
+			}
+		}
+	}
+
+	// All others
+	return select( selector.replace( rtrim, "$1" ), context, results, seed );
+}
