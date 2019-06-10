@@ -1,0 +1,25 @@
+$.fn.extend 与 $.extend 区别
+
+1. $.extend = $.fn.extend = function() {}//函数体一样，扩展不同的this而已
+
+2. $.extend 扩展的是jQuery类，即扩展的为静态方法
+   如：
+   $.extend({
+		log: function(msg) {
+			console.info(msg);
+		}
+   });
+   $.log('good');
+
+   3. $.fn.extend 扩展的this对象
+   $.fn.extend({
+		show: function(msg) {
+			console.info(msg);
+		}
+   });
+   invoke：$('ff').show('');
+
+4. $.extend({}, src1,src2); 扩展{}空对象
+
+
+5. $.extend(true, {} , src1, src2); 深复制扩展{}空对象
