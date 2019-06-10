@@ -1,0 +1,62 @@
+别名定义
+part1:
+jQuery.fn = jQuery.prototype 
+jQuery.extend = jQuery.fn.extend 
+
+part2：
+jQuery.find = Sizzle;
+jQuery.expr = Sizzle.selectors;
+Expr = Sizzle.selectors
+
+// Deprecated
+jQuery.expr[ ":" ] = jQuery.expr.pseudos;
+jQuery.uniqueSort = jQuery.unique = Sizzle.uniqueSort;
+jQuery.text = Sizzle.getText;
+jQuery.isXMLDoc = Sizzle.isXML;
+jQuery.contains = Sizzle.contains;
+jQuery.escapeSelector = Sizzle.escape;
+var rneedsContext = jQuery.expr.match.needsContext;
+
+
+part3:
+var init = jQuery.fn.init
+init.prototype = jQuery.fn;
+rootjQuery = jQuery( document );
+
+var readyList = jQuery.Deferred();
+jQuery.ready.then = readyList.then;
+
+Data.uid = 1;
+
+part4:
+var cssExpand = [ "Top", "Right", "Bottom", "Left" ];
+var documentElement = document.documentElement;
+wrapMap.optgroup = wrapMap.option;
+
+wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
+wrapMap.th = wrapMap.td;
+
+part5:
+Tween.prototype.init.prototype = Tween.prototype;
+jQuery.fx = Tween.prototype.init;
+jQuery.fx.step = {};
+
+part6:
+attrHandle = jQuery.expr.attrHandle;
+support.focusin = "onfocusin" in window;
+var location = window.location;
+var nonce = Date.now();
+
+part7：
+jQuery.isArray = Array.isArray;
+jQuery.parseJSON = JSON.parse;
+jQuery.nodeName = nodeName;
+jQuery.isFunction = isFunction;
+jQuery.isWindow = isWindow;
+jQuery.camelCase = camelCase;
+jQuery.type = toType;
+jQuery.now = Date.now;
+
+
+
+
