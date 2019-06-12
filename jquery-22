@@ -1,0 +1,197 @@
+1. 扩展jQuery.data 为elem添加data
+	jQuery.extend({
+		data : function(elem, name, data) {
+			return dataUser.access( elem, name, data );
+		}
+		...
+	})
+
+2. 扩展jQuery对象
+	jQuery.fn.extend({
+		
+		data: function(key , value) {
+			
+		}
+		...
+		
+	});
+	
+3. var dataUser = new Data();
+   var dataPriv = new Data(); //私有
+
+4. function Data() {
+		this.expando = jQuery.expando + Data.uid++;
+	}
+
+5. Data.uid = 1;
+
+6. Data.prototype = {
+	    cache: function(){...},
+		set: function(){...}		
+		get: function(){...},
+		access: function(){...},
+		remove: function(){...},
+		hasData: function(){...}
+   }
+  
+7. //-a-b 转换为驼峰
+	var rmsPrefix = /^-ms-/,
+		rdashAlpha = /-([a-z])/g;
+
+	// Used by camelCase as callback to replace()
+	function fcamelCase( all, letter ) {
+		return letter.toUpperCase();
+	}
+
+	// Convert dashed to camelCase; used by the css and data modules
+	// Support: IE <=9 - 11, Edge 12 - 15
+	// Microsoft forgot to hump their vendor prefix (#9572)
+	function camelCase( string ) {
+		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
+	}
+
+	var name = "abc-fds-ff";
+
+	console.info(camelCase(name));
+
+8. //为元素添加属性
+	function dataAttr( elem, key, data ) {
+		var name;
+		// 如果直接从属性没有取到，即data===undefined，尝试从HTML5的data-xx中获取
+		//限元素节点
+		if ( data === undefined && elem.nodeType === 1 ) {
+			//驼峰转-
+			name = "data-" + key.replace( rmultiDash, "-$&" ).toLowerCase();
+			//通过getAttribute获取data-xx
+			data = elem.getAttribute( name );
+
+			if ( typeof data === "string" ) {
+				try {
+					//从cache中获取
+					data = getData( data );
+				} catch ( e ) {}
+
+				//确保我们设置了数据，这样以后就不会更改了
+				dataUser.set( elem, key, data );
+			} else {
+				//如果值不是string，则返回undefined
+				data = undefined;
+			}
+		}
+		return data;
+	}
+
+9. //对数据处理下 类型转换下
+	function getData( data ) {
+		if ( data === "true" ) {
+			return true;
+		}
+
+		if ( data === "false" ) {
+			return false;
+		}
+
+		if ( data === "null" ) {
+			return null;
+		}
+
+		// 数字转换
+		if ( data === +data + "" ) {
+			return +data;
+		}
+		
+		//json字符串转JSON
+		if ( rbrace.test( data ) ) {
+			return JSON.parse( data );
+		}
+
+		return data;
+	}
+   
+//调用过程   
+ $('#d').data('a', 'b');
+ $('#d').data('a', {'c':'d'});
+ 
+ jQuery.fn.extend( {
+	data: function( key, value ) {
+		var i, name, data,
+			elem = this[ 0 ], //取到第0个元素
+			attrs = elem && elem.attributes; //返回元素的属性NameNodeMap { 0: {}, 1: {} , length: 2, k1: v1, k2:v2}
+
+		// 如果key为undefined，即无参数传入，为读取所有值 返回所有
+		if ( key === undefined ) {
+			if ( this.length ) { //先看element是否存在
+				// 将elem从dataUser中取出数据
+				data = dataUser.get( elem );
+				
+				//如果节点类型是元素1且非私有属性
+				if ( elem.nodeType === 1 && !dataPriv.get( elem, "hasDataAttrs" ) ) {
+					i = attrs.length;  //迭代所有属性名
+					while ( i-- ) {
+
+						// Support: IE 11 only
+						//属性值判空
+						if ( attrs[ i ] ) {
+							//读取属性名
+							name = attrs[ i ].name;
+							//如果属性名是data-开头
+							if ( name.indexOf( "data-" ) === 0 ) {
+								//读取属性转换成驼峰命名
+								name = camelCase( name.slice( 5 ) );
+								dataAttr( elem, name, data[ name ] );
+							}
+						}
+					}
+					dataPriv.set( elem, "hasDataAttrs", true );
+				}
+			}
+
+			return data;
+		}
+
+		// 如果是对象，迭代所有的key赋值
+		if ( typeof key === "object" ) {
+			return this.each( function() {
+				dataUser.set( this, key );
+			} );
+		}
+	
+		//访问数据
+		return access( this, function( value ) {
+			var data;
+
+			//如果元素本身的attr属性中没有找到
+			if ( elem && value === undefined ) {
+
+				//尝试从数据缓存中查找
+				data = dataUser.get( elem, key );
+				if ( data !== undefined ) {
+					return data;
+				}
+
+				//尝试通过html5的data-xx获取 
+				data = dataAttr( elem, key );
+				if ( data !== undefined ) {
+					return data;
+				}
+
+				//努力尝试过 没有找到
+				return;
+			}
+
+			//设置值到dataUser
+			this.each( function() {
+
+				// We always store the camelCased key
+				dataUser.set( this, key, value );
+			} );
+		}, null, value, arguments.length > 1, null, true );
+	},
+	
+	//移除元素上所有的key
+	removeData: function( key ) {
+		return this.each( function() {
+			dataUser.remove( this, key );
+		} );
+	}
+} );
