@@ -1,0 +1,85 @@
+//存储基本数据类型到 jQuery的缓存机制
+//参考:https://www.cnblogs.com/snandy/p/5644994.html
+
+
+var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
+	var i = 0,
+		len = elems.length,
+		bulk = key == null;
+
+	// 如果key是对象，遍历所有属性，递归调用
+	if ( toType( key ) === "object" ) {
+		chainable = true;
+		for ( i in key ) {
+			access( elems, fn, i, key[ i ], true, emptyGet, raw );
+		}
+
+	// key非object 且value有值
+	} else if ( value !== undefined ) {
+		//链
+		chainable = true;
+		
+		// 检查设置的是否是function， 设置原始值的状态
+		if ( !isFunction( value ) ) {
+			raw = true;
+		}
+		
+		// 有key的时候
+		if ( bulk ) {
+
+			// 原始数据的setter 
+			if ( raw ) {
+				fn.call( elems, value );
+				fn = null;
+
+			// 非原始数据
+			} else {
+				bulk = fn;
+				fn = function( elem, key, value ) {
+					return bulk.call( jQuery( elem ), value );
+				};
+			}
+		}
+		
+		//检查参数fn状态
+		if ( fn ) {
+			//迭代当前元素‘s
+			for ( ; i < len; i++ ) {
+				fn(
+					elems[ i ], key, raw ?
+					value :
+					value.call( elems[ i ], i, fn( elems[ i ], key ) )
+				);
+			}
+		}
+	}
+	
+	//是否链式调用 SET 返回当前元素， 
+	if ( chainable ) {
+		return elems;
+	}
+
+	// GET数据
+	if ( bulk ) {
+		return fn.call( elems );
+	}
+	
+	//返回值 第一个元素的key 不存在元素则为空
+	return len ? fn( elems[ 0 ], key ) : emptyGet;
+};
+
+//Data函数的原型函数 access
+access: function( owner, key, value ) {
+
+		// 1. key不存在 2. key存在且keystring且value不存在, 直接返回key的对应的值
+		if ( key === undefined ||
+				( ( key && typeof key === "string" ) && value === undefined ) ) {
+
+			return this.get( owner, key );
+		}
+		
+		// key不是string或key和value都有值, 设置值
+		this.set( owner, key, value );
+		
+		return value !== undefined ? value : key;
+	},
