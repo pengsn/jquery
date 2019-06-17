@@ -1,0 +1,90 @@
+//review 回顾
+
+//为jquery对象扩展data函数
+jQuery.fn.extend( {
+	
+	//数据存储
+	data: function( key, value ) {
+		var i, name, data,
+			//拿到当前选中的对象
+			elem = this[ 0 ],
+			//拿到当前对象上的属性
+			attrs = elem && elem.attributes;
+
+		//如果key无值，则返回所有的值
+		if ( key === undefined ) {
+			//如果当前元素存在
+			if ( this.length ) {
+				
+				//返回元素对应的cache对象 cache[this.expando]
+				data = dataUser.get( elem );
+				
+				
+				//如果为元素节点
+				if ( elem.nodeType === 1 && !dataPriv.get( elem, "hasDataAttrs" ) ) {
+					i = attrs.length;
+					//迭代所有的属性
+					while ( i-- ) {
+
+						//属性值可能为空，判断下
+						if ( attrs[ i ] ) {
+							name = attrs[ i ].name;
+							//节点上取值，没有取到值，则从HTML5的data-下取值，设置到data下
+							if ( name.indexOf( "data-" ) === 0 ) {
+								name = camelCase( name.slice( 5 ) );
+								dataAttr( elem, name, data[ name ] );
+							}
+						}
+					}
+					dataPriv.set( elem, "hasDataAttrs", true );
+				}
+			}
+			return data;
+		}
+
+		// 如果key为object，则为设置多个值
+		if ( typeof key === "object" ) {
+			return this.each( function() {
+				dataUser.set( this, key );
+			} );
+		}
+
+		//Get And Set
+		return access( this, function( value ) {
+			var data;
+			
+			// GET
+			if ( elem && value === undefined ) {
+
+				//读取元素的key
+				data = dataUser.get( elem, key );
+				if ( data !== undefined ) {
+					return data;
+				}
+
+				//从data-属性重查找
+				data = dataAttr( elem, key );
+				if ( data !== undefined ) {
+					return data;
+				}
+				
+				//努力查找，没有找到
+				return;
+			}
+
+			//SET
+			this.each( function() {
+
+				//key，value设置进去
+				dataUser.set( this, key, value );
+			} );
+		}, null, value, arguments.length > 1, null, true );
+	},
+	
+	//将key从cache[this.expando]下移除
+	removeData: function( key ) {
+		return this.each( function() {
+			dataUser.remove( this, key );
+		} );
+	}
+} );
