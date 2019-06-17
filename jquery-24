@@ -1,0 +1,145 @@
+数据类Data
+
+//js-Data类定义
+function Data() {
+	this.expando = jQuery.expando + Data.uid++;
+}
+
+//uid
+Data.uid = 1;
+
+//Data.prototype 原型方法
+cache | set | get | access | remove | hasData  
+
+// 1. cache
+// 返回已存在的cache对象|不存在创建一个新的cache对象
+ cache: function( owner ) {
+
+		// 检查当前对象是否生成过cache对象
+		var value = owner[ this.expando ];
+
+		// 如果没有 创建一个
+		if ( !value ) {
+			value = {};
+
+			// 不接受非元素节点, 只接受 1,9 跟object
+			if ( acceptData( owner ) ) {
+
+				//如果是1,9
+				if ( owner.nodeType ) {
+					owner[ this.expando ] = value;
+
+				//其他是对象的处理方式
+				} else {
+					//为当前对象this添加属性expando, 值为value，可以通过delete删除，可以再次设置
+					Object.defineProperty( owner, this.expando, {
+						value: value,
+						configurable: true
+					} );
+				}
+			}
+		}
+
+		return value;
+	}
+
+//2. set
+set: function( owner, data, value ) {
+		var prop,
+			//先获取cache对象
+			cache = this.cache( owner );
+		// 待设置的key是字符串，则key转驼峰
+		if ( typeof data === "string" ) {
+			cache[ camelCase( data ) ] = value;
+		// 处理对象
+		} else {
+			//一个一个属性转驼峰赋值
+			for ( prop in data ) {
+				cache[ camelCase( prop ) ] = data[ prop ];
+			}
+		}
+		return cache;
+	}
+	
+//3. get
+get: function( owner, key ) {
+	  //如果key不存在，返回整个对象cache
+		return key === undefined ?
+			this.cache( owner ) :
+
+			//检查是否有cache&&再从cache读取驼峰key的值
+			owner[ this.expando ] && owner[ this.expando ][ camelCase( key ) ];
+	}
+
+//4. access
+access: function( owner, key, value ) {
+
+		// key不存在返回所有|否则读取key对应的值
+		if ( key === undefined ||
+				( ( key && typeof key === "string" ) && value === undefined ) ) {
+
+			return this.get( owner, key );
+		}
+
+		// key不是字符串 或 value有值，则设置对象，并返回value或key
+		this.set( owner, key, value );
+		]
+		return value !== undefined ? value : key;
+	}
+
+//5. remove
+remove: function( owner, key ) {
+		var i,
+		//读取cache对象 
+			cache = owner[ this.expando ];
+		
+		//undefined，无需remove
+		if ( cache === undefined ) {
+			return;
+		}
+
+		//key有值
+		if ( key !== undefined ) {
+
+			if ( Array.isArray( key ) ) {
+				//如果key是数组,将数组每个key转换成驼峰
+				key = key.map( camelCase );
+			} else {
+				
+				//不是数组，将key转驼峰
+				key = camelCase( key );
+
+				//如果是空字符串，则返回[], 否则取【key】
+				key = key in cache ?
+					[ key ] :
+					( key.match( rnothtmlwhite ) || [] );
+			}
+
+			//看待删除的数组key个数
+			i = key.length;
+
+			//迭代一个一个删除
+			while ( i-- ) {
+				delete cache[ key[ i ] ];
+			}
+		}
+
+		// 如果key没有传值， cache没有创建过
+		if ( key === undefined || jQuery.isEmptyObject( cache ) ) {
+
+			//元素节点，则直接清除元素的标识属性 this.expando = undefined
+			if ( owner.nodeType ) {
+				owner[ this.expando ] = undefined;
+			} else {
+				//非元素节点--对象，则删除这个对象
+				delete owner[ this.expando ];
+			}
+		}
+	}
+
+//6. hasData
+hasData: function( owner ) {
+	//返回bool值，检查是否有值存入
+	var cache = owner[ this.expando ];
+	return cache !== undefined && !jQuery.isEmptyObject( cache );
+}
