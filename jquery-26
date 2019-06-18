@@ -1,0 +1,89 @@
+// queue , dequeue 
+
+jQuery.extend( {
+	
+	//队列操作
+	queue: function( elem, type, data ) {
+		var queue;
+		
+		//检查是否存在
+		if ( elem ) {
+			//类型判断或取fx + "queue"
+			type = ( type || "fx" ) + "queue";
+			
+			//从缓存中获取key = type的值
+			queue = dataPriv.get( elem, type );
+
+			// 如果这只是一个查找，通过快速退出队列来加快速度
+			if ( data ) {
+				//入队列
+				if ( !queue || Array.isArray( data ) ) {
+					//转成数组赋值进去并返回结果
+					
+  //queue = dataPriv[elem.expando][type] = jQuery.makeArray( data );
+					queue = dataPriv.access( elem, type, jQuery.makeArray( data ) );
+				} else {
+					//直接push
+					queue.push( data );
+				}
+			}
+			//返回队列
+			return queue || [];
+		}
+	},
+
+	//出队列
+	dequeue: function( elem, type ) {
+		type = type || "fx";
+		
+			//返回队列
+		var queue = jQuery.queue( elem, type ),
+			//队列长度
+			startLength = queue.length,
+			// 取出队列（数组）中的第一个值（先进先出），（第一个数据是上一次执行dequeue时添加到队列中的“inprogress”占位符？）
+			//取出第一个, 并移除
+			fn = queue.shift(),
+			
+			//获取一个hooks对象 
+			hooks = jQuery._queueHooks( elem, type ),
+			next = function() {
+				jQuery.dequeue( elem, type );
+			};
+
+		// 如果fx队列已退出队列，则始终删除进度标记
+		// 当进行出栈操作时，总是删除名为“inprogress”的数据，并继续取下一条。
+		if ( fn === "inprogress" ) {
+			fn = queue.shift();
+			startLength--;
+		}
+
+		if ( fn ) {
+
+	//添加占位符，阻止自动出栈（注释中是这么写的，不明白为什么会自动执行出栈操作）
+			if ( type === "fx" ) {
+				queue.unshift( "inprogress" );
+			}
+
+			// Clear up the last queue stop function
+			delete hooks.stop;
+			
+			//执行方法
+			fn.call( elem, next, hooks );
+		}
+		
+		//如果队列空了size=0，且hooks对象存在，则销毁cache对象
+		if ( !startLength && hooks ) {
+			hooks.empty.fire();
+		}
+	},
+
+	// 私有方法 ， key=type+"queueHooks" , 存在直接返回，否则生成一个
+	_queueHooks: function( elem, type ) {
+		var key = type + "queueHooks";
+		return dataPriv.get( elem, key ) || dataPriv.access( elem, key, {
+			empty: jQuery.Callbacks( "once memory" ).add( function() {
+				dataPriv.remove( elem, [ type + "queue", key ] );
+			} )
+		} );
+	}
+} );
