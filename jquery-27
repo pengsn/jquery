@@ -1,0 +1,217 @@
+// jQuery callbacks分析
+https://www.cnblogs.com/MnCu8261/p/6123492.html
+
+
+ //list存储待执行的list
+ //queue存储执行的上下文环境及传递参数
+
+//将options字符串以空格分割，转成对象 值为true
+function createOptions( options ) {
+	var object = {};
+	jQuery.each( options.match( rnothtmlwhite ) || [], function( _, flag ) {
+		object[ flag ] = true;
+	} );
+	return object;
+}
+
+jQuery.Callbacks = function( options ) {
+	
+	//将options转成对象，如果options为string，通过createOptions转换，否则直接扩展{}
+	options = typeof options === "string" ?
+		createOptions( options ) :
+		jQuery.extend( {}, options );
+
+	var // 标记当前正在触发的list
+		firing,
+
+		// 最后触发的值
+		memory,
+
+		// 标记已出发过的list
+		fired,
+
+		// 锁，防止触发
+		locked,
+
+		// 真实回调的list
+		list = [],
+
+		//可重复列表的执行数据队列
+		queue = [],
+
+		// 当前触发回调的索引(根据需要通过添加/删除进行修改)
+		firingIndex = -1,
+
+		// 触发回调
+		fire = function() {
+
+			// 检查是否locked|或者是否是单次执行
+			locked = locked || options.once;
+			
+			//执行所有未执行过的函数
+			//设置fired执行过，firing正在执行
+			fired = firing = true;
+			
+			//迭代队列里的函数
+			for ( ; queue.length; firingIndex = -1 ) {
+				memory = queue.shift();
+				while ( ++firingIndex < list.length ) {
+
+					// memory[ 0 ] == context, memory[ 1 ] = args ， 函数返回false或者stopOnFalse， 调到最后
+					if ( list[ firingIndex ].apply( memory[ 0 ], memory[ 1 ] ) === false &&
+						options.stopOnFalse ) {
+
+						// 跳转到结束并忘记数据，这样。add就不会重新启动
+						firingIndex = list.length;
+						memory = false;
+					}
+				}
+			}
+
+			// 检测callback的状态是否是memory
+			if ( !options.memory ) {
+				memory = false;
+			}
+
+			firing = false;
+
+			// locked true, 不能重复执行
+			if ( locked ) {
+
+				//如果memory状态true，则可以继续添加
+				if ( memory ) {
+					list = [];
+
+				//否则清空list, 无法添加
+				} else {
+					list = "";
+				}
+			}
+		},
+
+		// 实际回调的对象
+		self = {
+
+			// 添加回调函数到待回调的list集合
+			add: function() {
+				if ( list ) {
+
+					// 如果memory记录执行过一次， 放入queue中
+					if ( memory && !firing ) {
+						firingIndex = list.length - 1;
+						queue.push( memory );
+					}
+					
+					//执行
+					( function add( args ) {
+						jQuery.each( args, function( _, arg ) {
+							if ( isFunction( arg ) ) {
+								//唯一判断，放入list
+								if ( !options.unique || !self.has( arg ) ) {
+									list.push( arg );
+								}
+								//非string，而且有长度，数组及类数组, 递归迭代添加
+							} else if ( arg && arg.length && toType( arg ) !== "string" ) {
+								add( arg );
+							}
+						} );
+					} )( arguments );
+
+					// 如果memory记录执行过一次 直接运行
+					if ( memory && !firing ) {
+						fire();
+					}
+				}
+				return this;
+			},
+			
+			// 移除回调list
+			remove: function() {
+				jQuery.each( arguments, function( _, arg ) {
+					var index;
+				 //检查remove函数的位置，从list中remove掉
+					while ( ( index = jQuery.inArray( arg, list, index ) ) > -1 ) {
+						list.splice( index, 1 );
+
+						// Handle firing indexes
+						if ( index <= firingIndex ) {
+							firingIndex--;
+						}
+					}
+				} );
+				return this;
+			},
+
+			// 检查函数是否存在于list中
+			has: function( fn ) {
+				return fn ?
+					jQuery.inArray( fn, list ) > -1 :
+					list.length > 0;
+			},
+
+			//清空list
+			empty: function() {
+				if ( list ) {
+					list = [];
+				}
+				return this;
+			},
+
+			//禁用 并清空
+			disable: function() {
+				locked = queue = [];
+				list = memory = "";
+				return this;
+			},
+			
+			//状态检查
+			disabled: function() {
+				return !list;
+			},
+
+			// Disable .fire
+			// Also disable .add unless we have memory (since it would have no effect)
+			// Abort any pending executions
+			lock: function() {
+				locked = queue = [];
+				if ( !memory && !firing ) {
+					list = memory = "";
+				}
+				return this;
+			},
+			
+			//lock状态
+			locked: function() {
+				return !!locked;
+			},
+
+			// Call all callbacks with the given context and arguments
+			fireWith: function( context, args ) {
+				//首次执行locked=false
+				if ( !locked ) {
+					args = args || [];
+					args = [ context, args.slice ? args.slice() : args ];
+					//queue为context，
+					queue.push( args );
+					//callbak 没有执行中
+					if ( !firing ) {
+						fire();
+					}
+				}
+				return this;
+			},
+
+			// 执行fireWith, 返回this
+			fire: function() {
+				self.fireWith( this, arguments );
+				return this;
+			},
+
+			//fired状态
+			fired: function() {
+				return !!fired;
+			}
+		};
+
+	return self;
+};
