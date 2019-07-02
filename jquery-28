@@ -1,0 +1,33 @@
+//window窗口的状态事件
+// dom事件加载完成 
+function completed() {
+	//移除dom加载完成事件
+	// DOMContentLoaded | load
+	document.removeEventListener( "DOMContentLoaded", completed );
+	window.removeEventListener( "load", completed );
+	jQuery.ready();
+}
+
+页面加载性能统计 performance对象 属性[timing]
+
+//解析DOMContentLoaded |  load区别
+1. DOMContentLoaded 页面加载完成就会触发，不需要等待图片资源加载完成
+2. 当页面 DOM 结构中的 js、css、图片，以及 js 异步加载的 js、css 、图片都加载完成之后，才会触发 load 事件。
+
+
+//捕获调用$(document).ready()
+//当document状态 complete && != "loading" 
+if ( document.readyState === "complete" ||
+	( document.readyState !== "loading" && !document.documentElement.doScroll ) ) {
+
+	//加载完成执行 异步处理它，使脚本有机会延迟就绪
+	window.setTimeout( jQuery.ready );
+
+} else {
+	// 设置页面事件回调为自定义的 completed 执行 jQuery.ready()
+	// Use the handy event callback
+	document.addEventListener( "DOMContentLoaded", completed );
+
+	// A fallback to window.onload, that will always work
+	window.addEventListener( "load", completed );
+}
