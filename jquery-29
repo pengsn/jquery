@@ -1,0 +1,38 @@
+jQuery的加载完成的使用
+
+1. load 
+window.onload = function () {}
+$(window).load(function(){
+	
+});
+
+2. ready
+$(function(){})是$(document).ready(function(){})的简写形式。
+
+在一个页面中不同的js中写的$(function(){/*...*/});函数，会根据js的排列顺序依次执行。 
+
+window 指代当前浏览器可视窗口
+document 指代整个dom窗口
+
+//window及document获取窗口大小
+var s = ""; 
+s += " \r\n网页可见区域宽：" 	+ document.body.clientWidth; 
+s += " \r\n网页可见区域高：" 	+ document.body.clientHeight; 
+s += " \r\n网页可见区域宽：" 	+ document.body.offsetWidth ; 
+s += " \r\n网页可见区域高：" 	+ document.body.offsetHeight;
+s += " \r\n网页正文全文宽：" 	+ document.body.scrollWidth; 
+s += " \r\n网页正文全文高：" 	+ document.body.scrollHeight; 
+s += " \r\n网页被卷去的高(ff)：" + document.body.scrollTop; 
+s += " \r\n网页被卷去的高(ie)：" + document.documentElement.scrollTop; 
+s += " \r\n网页被卷去的左：" 	+ document.body.scrollLeft; 
+s += " \r\n视区内宽高      "    + window.innerHeight;
+s += " \r\n视区外宽高      "    + window.outerHeight;
+s += " \r\n网页正文部分上：" 	+ window.screenTop; 
+s += " \r\n网页正文部分左：" 	+ window.screenLeft; 
+s += " \r\n屏幕分辨率的高：" 	+ window.screen.height; 
+s += " \r\n屏幕分辨率的宽：" 	+ window.screen.width; 
+s += " \r\n屏幕可用工作区高度：" + window.screen.availHeight; 
+s += " \r\n屏幕可用工作区宽度：" + window.screen.availWidth;
+s += " \r\n你的屏幕设置是 " 		+ window.screen.colorDepth ;
+s += " \r\n你的屏幕设置 " 		+ window.screen.deviceXDPI ;
+console.info(s);
