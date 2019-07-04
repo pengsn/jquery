@@ -1,0 +1,60 @@
+jQuery.ready() 与 jQuery(document).ready()
+https://www.cnblogs.com/azhw/p/6170956.html
+
+//jQuery.ready() 定义
+jQuery.extend( {
+
+	// 状态
+	isReady: false,
+
+	// A counter to track how many items to wait for before
+	// the ready event fires. See #6781
+	readyWait: 1,
+
+	//处理函数
+	ready: function( wait ) {
+
+		// wait == true ， 取--readywait， readywait = 1， 则false； readywait=0，则true。
+		//wait == false， 去isReady状态
+		if ( wait === true ? --jQuery.readyWait : jQuery.isReady ) {
+			return;
+		}
+
+		// 设置isReady状态
+		jQuery.isReady = true;
+
+		// If a normal DOM Ready event fired, decrement, and wait if need be
+		if ( wait !== true && --jQuery.readyWait > 0 ) {
+			return;
+		}
+
+		// 如果document有函数绑定，则执行
+		readyList.resolveWith( document, [ jQuery ] );
+	}
+} );
+
+
+//jQuery(document).ready()
+
+jQuery.fn.ready = function( fn ) {
+
+	readyList
+		.then( fn )
+
+		//事件调用添加一个异常处理
+		.catch( function( error ) {
+			jQuery.readyException( error );
+		} );
+
+	return this;
+};
+
+//jQuery.readyException 异常定义
+jQuery.readyException = function( error ) {
+	window.setTimeout( function() {
+		throw error;
+	} );
+};
+
+//下节解析Deferred函数
+var readyList = jQuery.Deferred();
